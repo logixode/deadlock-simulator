@@ -1,28 +1,22 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="w-75 mx-auto">
+    <h1 class="mt-5 text-center">Deadlock Simulator</h1>
+    <h3 class="text-center mb-4">- Banker Algorithm -</h3>
+    <hr>
+    <TableDeadlock/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TableDeadlock from './components/TableDeadlock.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    TableDeadlock
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
