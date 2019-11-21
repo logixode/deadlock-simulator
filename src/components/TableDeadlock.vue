@@ -215,7 +215,7 @@ export default {
           title: 'Success...',
           text: 'Aman, proses telah selesai.',
         })
-        this.reStart()
+        // this.reStart()
       }
       // else {
       //   this.$swal({
