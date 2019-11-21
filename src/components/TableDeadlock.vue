@@ -164,7 +164,8 @@
           <th>{{ i.c }}</th>
 
           <th>
-            <span v-if="status[index] == success" class="text-success">{{ status[index] }}</span>
+            <span v-if="status[index] == 0"> - </span>
+            <span v-else-if="status[index] == success" class="text-success">{{ status[index] }}</span>
             <span v-else class="text-danger">{{ status[index] }}</span>
           </th>
         </tr>
@@ -198,25 +199,17 @@
 export default {
   name: 'TableDeadlock',
   methods: {
-    checkSuccess() {
-      const success = Object.values(this.status).every(n => { 
-        return n === this.success
+    checkSuccess(status) {
+      var value = Object.values(this.status).every(n => { 
+        return n === status
       })
-      const failed = Object.values(this.status).every(n => { 
-        return n === this.failed
-      })
-
-      if (success == true) {
-        this.showModal('success', 'Success...', 'Aman, proses telah selesai.')
-        // this.reStart()
-      }
-      if (failed == true) {
-        this.showModal('failed', 'Oops...', 'Proses mengalami Deadlock')
+      if (value) {
+        return true
       }
     },
     showModal(icon, title, text) {
       this.$swal({
-        icon: icon,
+        type: icon,
         title: title,
         text: text,
       })
@@ -244,7 +237,7 @@ export default {
         3: { a: 0, b: 1, c: 1 },
         4: { a: 4, b: 3, c: 1 },
       }
-      this.process = { a: 0, b: 0, c: 0 }
+      this.process = { a: 0, b: 0, c: 1 }
       this.status = { 
         0: '-', 1: '-', 2: '-', 3: '-', 4: '-'
       }
@@ -255,7 +248,7 @@ export default {
       var available  = this.available
       let a = this.process.a
 
-      if (this.process.a == 1 && this.process.c == 5) {
+      if (this.status[a] == this.success) {
         this.process.a++
       }
 
@@ -264,7 +257,7 @@ export default {
         this.process.b++
         this.status[this.process.a] = this.success
 
-        if ((this.status[a-=2]) == this.status[this.process.a]) {
+        if ((this.status[a]) == this.success) {
           this.process.c++
         }
       }
@@ -272,7 +265,6 @@ export default {
         if (this.status[this.process.a] == this.success) {
           this.process.b++
         }
-        this.process.c++
         this.status[this.process.a] = this.failed
       }
 
@@ -284,18 +276,16 @@ export default {
 
       if (this.process.a == 5) {
         this.process.a = 0
-        if (this.status[this.process.a] == this.failed) {
-          this.process.c++
-        }
-      }
-
-      if (this.status[this.process.a] == this.success) {
-        this.process.c++
       }
 
       this.start_process = true
 
-      this.checkSuccess()
+      if (this.checkSuccess(this.success)) {
+        this.showModal('success', 'Success...', 'Aman, proses telah selesai.')
+      }
+      if (this.checkSuccess(this.failed)) {
+        this.showModal('error', 'Oops...', 'Proses mengalami Deadlock')
+      }
       
     },
 
@@ -311,11 +301,18 @@ export default {
       var request    = {}
 
       if (process == 'Process') {
+        this.showModal('error', 'Oops...', 'Proses yang anda masukkan salah')
+      }
+      else {
         this.$swal({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Proses yang anda masukkan salah',
-        })
+            // toast: true,
+            // position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500,
+            type: 'success',
+            title: 'Request berhasil diproses',
+            // text: 'is a good day!',
+        });
       }
 
       request[process] = {
@@ -333,11 +330,7 @@ export default {
         allocation[process] = this.operation(allocation[process], request[process], true)
       }
       else {
-        this.$swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Request tidak dapat diproses karena telah melebihi resource',
-        })
+        this.showModal('error', 'Oops...', 'Request tidak dapat diproses karena telah melebihi resource')
       }
       
       this.request_index = 'Process'
@@ -368,7 +361,7 @@ export default {
   },
   data() {
     return {
-      process: { a: 0, b: 0, c: 0 },
+      process: { a: 0, b: 0, c: 1 },
       start_process: false,
       request_index: 'Process',
       val_request: {
@@ -409,7 +402,7 @@ export default {
         4: { a: 4, b: 3, c: 1 },
       },
       status: { 
-        0: '-', 1: '-', 2: '-', 3: '-', 4: '-'
+        0: 0, 1: 0, 2: 0, 3: 0, 4: 0
       }
     }
   }
