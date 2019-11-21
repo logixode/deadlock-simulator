@@ -138,7 +138,7 @@
         <h2>Mulai Simulasi</h2>
       </button>
 
-      <table v-else class="table table-bordered col-md-4" @click="statusShow">
+      <table v-else class="table table-bordered col-md-4">
         <tr align="center">
           <th scope="col" colspan="3">Need</th>
           <th scope="col" rowspan="2">Status</th>
@@ -147,12 +147,9 @@
               <span class="btn-refresh">Refresh</span>
             </button>
 
-            <button v-if="!start_process" class="btn btn-primary btn-start" @click="startProcess()">
-              <span>Start Process</span>
-            </button>
-
-            <button v-else class="btn btn-primary btn-start" @click="startProcess()">
-              <span>Next Process</span>
+            <button class="btn btn-primary btn-start" @click="startProcess()">
+              <span v-if="!start_process">Start Process</span>
+              <span v-else>Next Process</span>
             </button>
           </th>
         </tr>
@@ -200,39 +197,32 @@
 <script>
 export default {
   name: 'TableDeadlock',
-  watch: {
-    
-  },
   methods: {
     checkSuccess() {
-      const values = Object.values(this.status).every(n => { 
-        return n === "✓" 
+      const success = Object.values(this.status).every(n => { 
+        return n === this.success
+      })
+      const failed = Object.values(this.status).every(n => { 
+        return n === this.failed
       })
 
-      if (values == true) {
-        this.$swal({
-          icon: 'success',
-          title: 'Success...',
-          text: 'Aman, proses telah selesai.',
-        })
+      if (success == true) {
+        this.showModal('success', 'Success...', 'Aman, proses telah selesai.')
         // this.reStart()
       }
-      // else {
-      //   this.$swal({
-      //     icon: 'failed',
-      //     title: 'Oops...',
-      //     text: 'Proses mengalami Deadlock',
-      //   })
-      // }
+      if (failed == true) {
+        this.showModal('failed', 'Oops...', 'Proses mengalami Deadlock')
+      }
     },
-    showSuccess() {
+    showModal(icon, title, text) {
       this.$swal({
-        icon: 'success',
-        title: 'Success...',
-        text: 'Aman, proses telah selesai.',
+        icon: icon,
+        title: title,
+        text: text,
       })
     },
     reStart() {
+      this.start_process = false
       this.allocation =  {
         0: { a: 0, b: 1, c: 0 },
         1: { a: 2, b: 0, c: 0 },
@@ -307,10 +297,6 @@ export default {
 
       this.checkSuccess()
       
-    },
-
-    statusShow() {
-      this.status_show = true
     },
 
     showNeed() {
@@ -392,7 +378,6 @@ export default {
       },
       success: "✓",
       failed: "✘",
-      status_show: false,
       start_simulator: false,
       column_process: ["A", "B", "C"],
       allocation: {
